@@ -1,18 +1,34 @@
+from discord.ext.commands import Bot
+from discord import Intents
 
-# import discord modules
-import discord
-from discord.ext import commands
+class InviteTracker(Bot):
+
+    def __init__(self, config):
+        self.config=config
+        
+        intents = Intents.default()
+        intents.members = True
+        super().__init__(command_prefix=self.config.Prefix,
+            case_sensitive=False,
+            intents=intents
+        )
 
 
+    def ignite(self, token):
+        self.token = token
+        self.run(self.token)
 
 
-# create bot instance
-bot = commands.Bot(
-    command_prefix=",",         # the prefix used for commands
-    activity=discord.Game("Discord")
-)
+    async def on_ready(self):
+        print(f"{self.user.name} is now online!")
 
 
-@bot.event
-async def on_ready():
-    print(f"{bot.user.name} is now online!")
+    def load_extensions(self, extensions:list = ["jishaku"]):
+        
+        for extension in extensions:
+            try:
+                self.load_extension(extension)
+            except Exception as e:
+                raise e
+        
+        return

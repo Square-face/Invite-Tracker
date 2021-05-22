@@ -12,9 +12,11 @@ if __name__ == "__main__":
     config = Config()
     
     # initiating bot instance and setting config variable
-    bot = Bot.bot
-    bot.config=config
+    bot = Bot.InviteTracker(config)
     
+    
+    # load extensions
+    bot.load_extensions()
     
     # running bot
-    bot.run(config.Token)
+    bot.ignite(config.Token)
