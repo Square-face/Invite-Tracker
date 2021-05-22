@@ -1,2 +1,0 @@
-discord.py==1.7.2
-pyyaml==5.4.1
