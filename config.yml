@@ -2,11 +2,11 @@
 # ---
 
 # the bot token. Can be found on discord.com/developers
-Token: ""
-
+Token:    ""
+Prefix:   ","
 
 
 # Website
 # -------
 
-# coming soon.
+# comming soon
