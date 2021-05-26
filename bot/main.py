@@ -1,3 +1,4 @@
+import datetime
 from discord.ext.commands import Bot
 from discord import Intents
 
@@ -24,6 +25,7 @@ class InviteTracker(Bot):
             The config class for the config.yml file that stores data necessary to start the bot.
         """
         self.config=config
+        self.start_time=datetime.datetime.utcnow()
         
         intents = Intents.default()
         intents.members = True
@@ -51,14 +53,17 @@ class InviteTracker(Bot):
 
 
     async def on_ready(self):
-        '''Bot is online
+        '''Bot has connected to discord API
         
-        This function is run when the bot has successfully connected to discord.
+        Sets start time to currently UTC datetime and prints out startup message.
         '''
+        
+        self.start_time=datetime.datetime.utcnow()
+        
         print(f"{self.user.name} is now online!")
 
 
-    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner"]):
+    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info"]):
         '''Load bot extensions
         
         Load a list of bot extensions.
