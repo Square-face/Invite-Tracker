@@ -1,7 +1,7 @@
 # Invite-Tracker
 Invite Tracker is a Open Source discord bot. 
 
-**As for now, no features has been created for this bot.**
+**As for now, very few features has been created for this bot.**
 
 The bot tracks and logs who invited who and alow you to rewards the members who have helped
 grow your community the most with the "AutoRole" feature.
