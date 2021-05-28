@@ -1,4 +1,4 @@
-import datetime
+import datetime, os
 from discord.ext.commands import Bot
 from discord import Intents
 
@@ -76,6 +76,9 @@ class InviteTracker(Bot):
         extensions: :class:`list`
             A list of all the extension that should be loaded.
         '''
+        
+        if "jishaku" in extensions:
+            os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
         
         for extension in extensions:
             try:
