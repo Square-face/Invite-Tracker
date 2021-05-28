@@ -29,9 +29,11 @@ class InviteTracker(Bot):
         
         intents = Intents.default()
         intents.members = True
-        super().__init__(command_prefix=self.config.Prefix,
+        super().__init__(
+            command_prefix=self.config.Prefix,
             case_sensitive=False,
-            intents=intents
+            intents=intents,
+            description=self.config.Description
         )
 
 

@@ -12,6 +12,8 @@ Prefix: ","
 # the main color used by the bot
 Color:  0xfa2a3f
 
+# short description about the bot
+Description: "A bot to track who has invited who and reward the ones who has invited the most!"
 
 # Website
 # -------
