@@ -63,7 +63,7 @@ class InviteTracker(Bot):
         print(f"{self.user.name} is now online!")
 
 
-    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info"]):
+    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info", "bot.cogs.help"]):
         '''Load bot extensions
         
         Load a list of bot extensions.
