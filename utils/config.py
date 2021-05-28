@@ -56,11 +56,14 @@ class Config():
         file = open(self.filename, "r")
         stream = yaml.load(file.read(), Loader=Loader)
         
-        args = ["Token", "Prefix"]
+        args = ["Token", "Prefix", "Color"] # all keys that has to be in config file
+        can_be_empty = ["Color"]            # they keys that can still be 0 or None
         
         for arg in args:
             if not arg in stream.keys():
                 raise MissingKey(f"The '{arg}' key is missing in config file({self.filename}). Make sure you are using a up-to-date file.")
             
+            if arg in can_be_empty:
+                continue
             if not stream[arg]:
                 raise MissingValue(f"No value for '{arg}' has been set. Make sure all values in the config file({self.filename}) is set right and restart the bot.")
