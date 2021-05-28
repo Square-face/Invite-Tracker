@@ -18,11 +18,14 @@ class Info(commands.Cog):
         - `Start time`
         '''
         
+        # how long the bot has been online
         online_time = humanize.naturaltime(datetime.datetime.utcnow()-self.bot.start_time)[:-4]
         
+        # number of text and voice channels
         text_channels=[]
         voice_channels=[]
         
+        # get Voice and Text Channel amount.
         for channel in self.bot.get_all_channels():
             if channel.type == discord.ChannelType.text:
                 text_channels.append(channel)
@@ -32,6 +35,8 @@ class Info(commands.Cog):
                 voice_channels.append(channel)
                 continue
         
+        
+        # creating info embed
         embed = discord.Embed(
             title=f"{self.bot.user.name} Statistics and Information",
             description=f"{self.bot.user.name} has been online for `{online_time}` and is currently in `{len(self.bot.guilds)} server(s)` and can see `{len(self.bot.users)} user(s)`.",
@@ -45,6 +50,7 @@ class Info(commands.Cog):
             value=f"<:Text_Channel:778350926468743228> Text Channels: `{len(text_channels)}`\n<:Voice_Channel:778351389415440395> Voice Channels: `{len(voice_channels)}`"
         )
         
+        # send embed
         return await ctx.send(embed=embed)
 
 def setup(bot):
