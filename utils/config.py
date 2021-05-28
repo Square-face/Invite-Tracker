@@ -43,6 +43,7 @@ class Config():
         # values
         self.Token = self.stream["Token"]
         self.Prefix = self.stream["Prefix"]
+        self.Color = self.stream["Color"]
     
     def CheckConfig(self):     
         """Check the config file
