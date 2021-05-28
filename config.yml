@@ -1,9 +1,15 @@
 # Bot
 # ---
 
-# the bot token. Can be found on discord.com/developers
-Token:    ""
-Prefix:   ","
+
+Token:  # the bot token. Can be found on discord.com/developers
+""
+
+Prefix: # the default prefix for invoking a command with the bot
+","
+
+Color:  # the main color used by the bot
+0xfa2a3f
 
 
 # Website
