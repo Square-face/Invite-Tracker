@@ -16,7 +16,9 @@ class MyHelp(commands.HelpCommand):
         
         # create embed
         embed = discord.Embed(
-            title=f"{bot.user.name} help"
+            color=bot.config.Color,
+            title=f"{bot.user.name} help",
+            description=bot.description
         )
         
         return await ctx.send(embed=embed)
