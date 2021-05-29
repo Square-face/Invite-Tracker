@@ -8,7 +8,7 @@ class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(name="bot_info", aliases=["bi", "botinfo"])
+    @commands.command(name="bot_info", aliases=["bi", "botinfo"], brief="General information about me!")
     @commands.bot_has_permissions(use_external_emojis=True, embed_links=True, send_messages=True)
     async def ABCbot_info(self, ctx):
         '''Give information and statistics about the bot.

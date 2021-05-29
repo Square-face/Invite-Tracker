@@ -1,4 +1,4 @@
-import datetime
+import datetime, os
 from discord.ext.commands import Bot
 from discord import Intents
 
@@ -29,9 +29,11 @@ class InviteTracker(Bot):
         
         intents = Intents.default()
         intents.members = True
-        super().__init__(command_prefix=self.config.Prefix,
+        super().__init__(
+            command_prefix=self.config.Prefix,
             case_sensitive=False,
-            intents=intents
+            intents=intents,
+            description=self.config.Description
         )
 
 
@@ -63,7 +65,8 @@ class InviteTracker(Bot):
         print(f"{self.user.name} is now online!")
 
 
-    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info", "bot.cogs.system"]):
+
+    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info", "bot.cogs.system", "bot.cogs.help"]):
         '''Load bot extensions
         
         Load a list of bot extensions.
@@ -76,6 +79,9 @@ class InviteTracker(Bot):
         extensions: :class:`list`
             A list of all the extension that should be loaded.
         '''
+        
+        if "jishaku" in extensions:
+            os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
         
         for extension in extensions:
             # go through extensions to load them
