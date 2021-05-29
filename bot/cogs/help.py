@@ -22,28 +22,37 @@ class MyHelp(commands.HelpCommand):
         )
         
         for extension in bot.cogs.values():
+            # go through all extensions
             
             if extension.qualified_name == "Jishaku":
+                # ignore the extension if it was Jishaku
                 continue
             
             # a list of all the available commands in this extensions
             commands = []
             
             for cmd in extension.walk_commands():
+                # go through all commands
+                
                 if cmd.hidden and not await bot.is_owner(ctx.author):
+                    # if the command is hidden and the author is not a bot owner
                     continue
                 
+                # add the command to command list
                 commands.append(f"`{cmd.name:10}` - {cmd.brief}")
             
             if len(commands) == 0:
+                # ignore this extension if it didn't have any commands
                 continue
             
+            # add the extension to embed with all of its commands
             embed.add_field(
                 name=extension.qualified_name,
                 value='\n'.join(commands),
                 inline=False
             )
         
+        # send help embed
         return await ctx.send(embed=embed)
 
 def setup(bot):
