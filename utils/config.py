@@ -43,6 +43,8 @@ class Config():
         # values
         self.Token = self.stream["Token"]
         self.Prefix = self.stream["Prefix"]
+        self.Color = self.stream["Color"]
+        self.Description = self.stream["Description"]
     
     def CheckConfig(self):     
         """Check the config file
@@ -56,7 +58,7 @@ class Config():
         file = open(self.filename, "r")
         stream = yaml.load(file.read(), Loader=Loader)
         
-        args = ["Token", "Prefix", "Color"] # all keys that has to be in config file
+        args = ["Token", "Prefix", "Color", "Description"] # all keys that has to be in config file
         can_be_empty = ["Color"]            # they keys that can still be 0 or None
         
         for arg in args:
