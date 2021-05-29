@@ -139,7 +139,7 @@ class Owner(commands.Cog):
                     return await msg.clear_reactions()
     
     
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def dev(self, ctx:commands.Context):
         '''Developer bot info
@@ -161,9 +161,7 @@ class Owner(commands.Cog):
         # send embed
         return await ctx.send(embed=embed)
 
-
-
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def reload(self, ctx:commands.Context, *, cogs: Optional[str]):
         '''Use this command to reload one or more bot cogs/modules.
