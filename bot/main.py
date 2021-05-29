@@ -63,7 +63,7 @@ class InviteTracker(Bot):
         print(f"{self.user.name} is now online!")
 
 
-    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info"]):
+    def load_extensions(self, extensions:list = ["jishaku", "bot.cogs.owner", "bot.cogs.info", "bot.cogs.system"]):
         '''Load bot extensions
         
         Load a list of bot extensions.
@@ -78,9 +78,16 @@ class InviteTracker(Bot):
         '''
         
         for extension in extensions:
+            # go through extensions to load them
+            
             try:
+                # attemt to load extension
                 self.load_extension(extension)
+                
             except Exception as e:
-                raise e
-        
+                # send error if loading extension failed
+                print(f"[{extensions.index(extension)+1}] - Failed to load extension: {extension}\n{e}\n")
+                
+            else:
+                print(f"[{extensions.index(extension)+1}] - Loaded extension: {extension}")
         return
