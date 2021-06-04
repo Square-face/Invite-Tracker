@@ -1,7 +1,4 @@
-# Bot
-# ---
-
-
+# ---Bot---
 
 # the bot token. Can be found on discord.com/developers
 Token:  ""
@@ -14,6 +11,24 @@ Color:  0xfa2a3f
 
 # short description about the bot
 Description: "A bot to track who has invited who and reward the ones who has invited the most!"
+
+
+
+# ---DataBase---
+
+# The ip of your MariaDB database
+Host: 127.0.0.1
+
+# the port for your MariaDB database
+# 3306 is the default MariaDB port
+Port: 3306
+
+# Username for your MariaDB database
+User: ""
+
+# Password for your MariaDB database
+Password: ""
+
 
 # Website
 # -------
