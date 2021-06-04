@@ -9,7 +9,11 @@ class MyHelp(commands.HelpCommand):
     Uses a paginator so you can navigate without reinvoking the help command.'''
 
     async def send_bot_help(self, mapping):
-        '''Show all commands and what modules they are in.'''
+        '''Show all commands and what modules they are in.
+        
+        Go trough each cog/module and its corresponding commands.
+        Make a embed showing all the cogs and their commands.
+        '''
 
         # defining variables
         ctx = self.context
@@ -45,7 +49,7 @@ class MyHelp(commands.HelpCommand):
                     continue
 
                 # add the command to command list
-                commands.append(f"`{cmd.name:10}` - {cmd.brief}")
+                commands.append(f"`{cmd.name:12}` - {cmd.brief}")
 
             if len(commands) == 0:
                 # ignore this extension if it didn't have any commands
@@ -64,15 +68,22 @@ class MyHelp(commands.HelpCommand):
     async def send_cog_help(self, cog):
         '''Send information about a module
         
-        Information includes: commands ond cog description'''
+        Show a cogs description and its command.
+        The commands should also have their brief description as well
+        as their signatures
+        '''
         
         # defining variables
         ctx = self.context
         bot = self.context.bot
         prefix = self.clean_prefix
+        is_owner = await bot.is_owner(ctx.author)
         
-        if cog.qualified_name == "Jishaku" and not await bot.is_owner(ctx.author):
-            return await ctx.send(f'No command called "{cog.qualified_name}" found.')
+        if cog.qualified_name == "Jishaku" and not is_owner:
+            # ignore all commands from Jishaku cog if the author is
+            # not a bot owner
+            await ctx.send(f'No command called "{cog.qualified_name}" found.')
+            return
         
         # creating help embed
         embed = discord.Embed(
@@ -104,8 +115,10 @@ class MyHelp(commands.HelpCommand):
         
         
         if len(command_list) == 0:
-            # if no commands existed for this cog, ignore it and send error message
-            return await ctx.send(f'No command called "{cog.qualified_name}" found.')
+            # if no commands existed for this cog,
+            # ignore it and send error message
+            await ctx.send(f'No command called "{cog.qualified_name}" found.')
+            return
         
         # add the commands to help embed
         embed.add_field(
@@ -114,7 +127,8 @@ class MyHelp(commands.HelpCommand):
         )
         
         # send embed
-        return await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
+        return
         
         
         
