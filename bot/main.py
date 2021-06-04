@@ -98,7 +98,7 @@ class InviteTracker(Bot):
                 print(f"[{extensions.index(extension)+1}] - Loaded extension: {extension}")
         return
 
-    def get_vissible_commands(self, is_owner:bool=False):
+    def get_visible_commands(self, is_owner:bool=False):
         """Get a list of all availible commands.
 
         Generates a list of all the commands and groups that are not owner only
