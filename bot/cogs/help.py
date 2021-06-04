@@ -24,6 +24,7 @@ class MyHelp(commands.HelpCommand):
 
         for extension in bot.cogs.values():
             # go through all extensions
+            
             if extension.qualified_name == "Jishaku":
                 # ignore the extension if it was Jishaku
                 continue
@@ -36,6 +37,10 @@ class MyHelp(commands.HelpCommand):
 
                 if cmd.hidden and not await bot.is_owner(ctx.author):
                     # if the command is hidden and the author is not a bot owner
+                    continue
+                
+                if cmd.parent:
+                    # if the command is a subcommand, ignore it
                     continue
 
                 # add the command to command list
@@ -117,21 +122,34 @@ class MyHelp(commands.HelpCommand):
             color=bot.config.Color
         ).add_field(
             name="Syntax",
-            value=f"`{prefix}{command.name} {command.signature}`",
+            value=f"`{prefix}{command.qualified_name} {command.signature}`",
             inline=False
         )
 
 
+        try:
+            aliases="No aliases."
 
-        aliases="No aliases."
+            if len(command.aliases) > 0:
+                aliases=f"`{'` | `'.join(list(command.aliases))}`"
+            
+            embed.add_field(name="Aliases", value=aliases)
+            
+            
+            if isinstance(command, commands.Group):
+                sub = "No subcommands"
+                
+                if len(command.commands) > 0:
+                    sub=f"`{'` | `'.join([cmd.name for cmd in list(command.commands)])}`"
+                
+                embed.add_field(name="Subcommands", value=sub)
 
-        if len(command.aliases) > 0:
-            aliases=f"`{'` | `'.join(list(command.aliases))}`"
+            
+            embed.add_field(name="Module", value=command.cog.qualified_name.capitalize())
 
-        embed.add_field(name="Aliases", value=aliases)
-        embed.add_field(name="Module", value=command.cog.qualified_name.capitalize())
-
-        return embed
+            return embed
+        except Exception as e:
+            print(e)
 
     async def send_command_help(self, command):
         """Show info on a command.
@@ -145,7 +163,7 @@ class MyHelp(commands.HelpCommand):
         prefix = self.clean_prefix
 
         # list of commands
-        command_list = bot.get_vissible_commands(await bot.is_owner(ctx.author))
+        command_list = bot.get_visible_commands(await bot.is_owner(ctx.author))
 
 
         try:
