@@ -1,29 +1,29 @@
 import discord, asyncio
 from discord.ext import commands, menus
-from typing import Optional, List
+from typing import Union, List
 
 
 class Paginator(menus.Menu):
-    """Naviagte manue with reactions.
+    """Navigate menu with reactions.
 
-    Naviagte a manue by reaction to reactions. a list of pages is passed and a
+    Navigate a menu by reaction to reactions. a list of pages is passed and a
     start page. The start page is 0 by default. When the start function is ran
-    and there is no specifyed message a new one will be sent. If there is one
+    and there is no specified message a new one will be sent. If there is one
     the reactions will be added to that message.
     There exists 5 buttons and 2 more planed.
 
     The 5 existing ones are:
-    FIRST:  Wich navigates to the first page in the lsit of pages
-    BACK:   Wich navigates to the priveous page in the list of pages
-    STOP:   Wich stops the paginator from listening to reactions
-    NEXT:   Wich moves to the next page in the list of pages
-    LAST:   Wich moves to the last page in the list of pages.
+    FIRST:  Witch navigates to the first page in the list of pages
+    BACK:   Witch navigates to the previous page in the list of pages
+    STOP:   Witch stops the paginator from listening to reactions
+    NEXT:   Witch moves to the next page in the list of pages
+    LAST:   Witch moves to the last page in the list of pages.
 
     planed buttons:
     NUMBER: Choice a page to go to by sending a number in chat.
     INFO:   Show info on what all the buttons do.
     """
-    def __init__(self, *, user:discord.User=None, users:List[discord.User]=None, page:int=0, timeout:float=180.0, delete_message_after:bool=False, clear_reactions_after:bool=True, check_embeds:bool=True, message:discord.Message=None, replace_footer:bool=True):
+    def __init__(self, *, user:discord.User=None, users:List[discord.User]=None, page:int=0, pages:List[Union[discord.Embed, str]]=None, timeout:float=180.0, delete_message_after:bool=False, clear_reactions_after:bool=True, check_embeds:bool=True, message:discord.Message=None, replace_footer:bool=True):
         """
         Defining all variables for paginator.
 
@@ -66,7 +66,7 @@ class Paginator(menus.Menu):
             applyes to embeds without footers. Defaults to True.
         """
 
-        self.pages = []
+        self.pages = pages or []
         self.page = page
         self.timeout = timeout
         self.delete_message_after = delete_message_after

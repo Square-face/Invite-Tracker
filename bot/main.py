@@ -98,11 +98,11 @@ class InviteTracker(Bot):
                 print(f"[{extensions.index(extension)+1}] - Loaded extension: {extension}")
         return
 
-    def get_visible_commands(self, is_owner:bool=False):
-        """Get a list of all availible commands.
+    def get_normal_commands(self, is_owner:bool=False):
+        """Get a list of all available commands.
 
         Generates a list of all the commands and groups that are not owner only
-        and from the jishaku cog.
+        and from the jishaku cog. Not that this function won't return any subcommands.
 
         args
         ----
@@ -125,6 +125,52 @@ class InviteTracker(Bot):
                 continue
 
             for cmd in cog.walk_commands():
+                
+                if cmd.parent:
+                    # ignore all commands that has a parent command,
+                    # this means they are a subcommand and should not be added.
+                    continue
+
+                if not cmd.hidden or is_owner:
+                    # add the command if it is not hidden and the user is not a bot owner.
+                    command_list.append(cmd)
+
+
+        return command_list
+
+
+    def get_subcommands(self, is_owner:bool=False):
+        """Get a list of all available subcommands.
+
+        Generates a list of all the commands and groups that are not owner only
+        and from the jishaku cog. Not that this function won't return any subcommands.
+
+        args
+        ----
+        is_owner: :class:`bool`
+            if the user who is to see these commands is a bot owner.
+
+
+        returns
+        -------
+        List[Union[:class:`commands.command`, :class:`commands.group`]]
+        """
+
+        command_list = []
+
+        for cog in self.cogs.values():
+            # go through all cogs and the commands inside of each cog
+
+            # ignore the jishaku cog
+            if cog.qualified_name == "Jishaku":
+                continue
+
+            for cmd in cog.walk_commands():
+                
+                if not cmd.parent:
+                    # ignore all commands that has a parent command,
+                    # this means they are a subcommand and should not be added.
+                    continue
 
                 if not cmd.hidden or is_owner:
                     # add the command if it is not hidden and the user is not a bot owner.
