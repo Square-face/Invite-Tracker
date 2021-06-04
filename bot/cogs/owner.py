@@ -197,6 +197,23 @@ class Owner(commands.Cog):
         # ask retry question
         await self.retry_cogs(ctx, msg, cogs)
 
+    @commands.group(hidden=True, aliases=["bl"], brief="View and edit the blacklists for this bot")
+    @commands.is_owner()
+    async def blacklist(self, ctx):
+        if ctx.invoked_subcommand:
+            return
+        
+        await ctx.send("This is a decoy command")
+    
+    @blacklist.command(hidden=True, name="blacklist", aliases=["bl", "add", "a"], brief="Blacklist a user or server")
+    @commands.is_owner()
+    async def add_blacklist(self, ctx, subject):
+        await ctx.send(f"Blacklisted \"{subject}\"")
+    
+    @blacklist.command(hidden=True, aliases=["ubl", "remove", "r"], brief="UnBlacklist a user or server")
+    @commands.is_owner()
+    async def unblacklist(self, ctx, subject):
+        await ctx.send(f"Unblacklisted \"{subject}\"")
 
 def setup(bot):
     bot.add_cog(Owner(bot))
