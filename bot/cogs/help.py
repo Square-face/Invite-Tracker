@@ -33,18 +33,18 @@ class MyHelp(commands.HelpCommand):
 
             for cmd in extension.walk_commands():
                 # go through all commands
-                
+
                 if cmd.hidden and not await bot.is_owner(ctx.author):
                     # if the command is hidden and the author is not a bot owner
                     continue
-                    
+
                 # add the command to command list
                 commands.append(f"`{cmd.name:10}` - {cmd.brief}")
 
             if len(commands) == 0:
                 # ignore this extension if it didn't have any commands
                 continue
-                
+
             # add the extension to embed with all of its commands
             embed.add_field(
                 name=extension.qualified_name,
@@ -73,7 +73,15 @@ class MyHelp(commands.HelpCommand):
         if len(command.aliases) > 0:
             aliases=f"`{'` | `'.join(list(command.aliases))}`"
 
+        sub = "No subcommands."
+
+        if isinstance(command, commands.Group):
+
+            if len(command.commands) > 0:
+                aliases=f"`{'` | `'.join(list(command.commands))}`"
+
         embed.add_field(name="Aliases", value=aliases)
+        embed.add_field(name="Subcommands", value=sub)
         embed.add_field(name="Module", value=command.cog.qualified_name.capitalize())
 
         return embed
@@ -101,10 +109,6 @@ class MyHelp(commands.HelpCommand):
 
                 if cmd.hidden and not await bot.is_owner(ctx.author):
                     # ignore all hidden commands as long as the author is not a bot owner
-                    continue
-
-                if isinstance(cmd, commands.Group):
-                    # ignore all group commands
                     continue
 
                 if cmd.cog.qualified_name == "Jishaku":
