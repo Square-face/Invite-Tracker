@@ -166,9 +166,12 @@ class Owner(commands.Cog):
     @commands.is_owner()
     async def reload(self, ctx:commands.Context, *, cogs: Optional[str]):
         '''Use this command to reload one or more bot cogs/modules.
+
         Leave the `cogs` argument empty to reload all currently loaded cogs.
-        Use the cog name and cog path (for example "bot.cogs.owner") to reload a specific cog.
-        Use multiple cog paths to reload a specified list of cogs (for example "bot.cogs.owner bot.cogs.info") and remember to separate the cog names with spaces.
+        Use the cog name and cog path (for example "bot.cogs.owner") to reload a
+        specific cog. Use multiple cog paths to reload a specified list of cogs
+        (for example "bot.cogs.owner bot.cogs.info") and remember to separate
+        the cog names with spaces.
         '''
 
 
@@ -186,10 +189,10 @@ class Owner(commands.Cog):
 
         if success:
             # all the cogs was successfully reloaded
-            return await ctx.send("\n\n".join(response))
+            return await ctx.send("\n".join(response))
 
         # one or more cogs failed to reload correctly
-        msg = await ctx.send("\n\n".join(response))
+        msg = await ctx.send("\n".join(response))
 
         # ask retry question
         await self.retry_cogs(ctx, msg, cogs)
