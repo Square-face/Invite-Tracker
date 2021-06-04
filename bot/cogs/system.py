@@ -5,6 +5,11 @@ class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
+    @commands.Cog.listener("on_message_edit")
+    async def edit_command(self, before, after):
+        del before
+        
+        await self.bot.process_commands(after)
     
     @commands.Cog.listener("on_command_error")
     async def command_not_found(self, ctx, error):
