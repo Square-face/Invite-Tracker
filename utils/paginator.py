@@ -4,16 +4,37 @@ from typing import Optional, List
 
 
 class Paginator(menus.Menu):
-    def __init__(self, pages=[], *, Optional[user:discord.User], Optional[List[users:discord.User]], page:int=0, timeout:float=180.0, delete_message_after:bool=False, clear_reactions_after:bool=True, check_embeds:bool=True, message:discord.Message=None, replace_footer:bool=True):
+    """Naviagte manue with reactions.
+
+    Naviagte a manue by reaction to reactions. a list of pages is passed and a
+    start page. The start page is 0 by default. When the start function is ran
+    and there is no specifyed message a new one will be sent. If there is one
+    the reactions will be added to that message.
+    There exists 5 buttons and 2 more planed.
+
+    The 5 existing ones are:
+    FIRST:  Wich navigates to the first page in the lsit of pages
+    BACK:   Wich navigates to the priveous page in the list of pages
+    STOP:   Wich stops the paginator from listening to reactions
+    NEXT:   Wich moves to the next page in the list of pages
+    LAST:   Wich moves to the last page in the list of pages.
+
+    planed buttons:
+    NUMBER: Choice a page to go to by sending a number in chat.
+    INFO:   Show info on what all the buttons do.
+    """
+    def __init__(self, *, user:discord.User=None, users:List[discord.User]=None, page:int=0, timeout:float=180.0, delete_message_after:bool=False, clear_reactions_after:bool=True, check_embeds:bool=True, message:discord.Message=None, replace_footer:bool=True):
         """
         Defining all variables for paginator.
 
         args
         ----
-        bot: :class:`commands.Bot`
-            The bot used.
-        pages: Optional[List[:class:`discord.Embed`, :class:`str`]]
-            A list of all pages, as embeds or string format.
+        page: Optional[:class:`int`]
+            The currently selected page. First page is 1. Defaults to 1
+
+
+        kwargs
+        ------
         user: Optional[:class:`discord.User`]
             The user who can edit this paginator.
             Can be None if anyone should be able to edit the paginator. Defaults
@@ -22,11 +43,6 @@ class Paginator(menus.Menu):
             A list of user who can edit this paginator. If user arg was
             specified this arg will be ignored. Can be None if anyone should be
             able to edit the paginator. Defaults to None.
-
-        kwargs
-        ------
-        page: Optional[:class:`int`]
-            The currently selected page. First page is 1. Defaults to 1
         timeout: Optional[:class:`float`]
             The amount of time in seconds the user has between each reaction.
             If more time has passed the paginator will stop listen for reactions.
@@ -50,8 +66,8 @@ class Paginator(menus.Menu):
             applyes to embeds without footers. Defaults to True.
         """
 
-        self.pages = pages
-        self.page=page
+        self.pages = []
+        self.page = page
         self.timeout = timeout
         self.delete_message_after = delete_message_after
         self.clear_reactions_after = clear_reactions_after
