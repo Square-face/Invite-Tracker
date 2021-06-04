@@ -128,15 +128,7 @@ class MyHelp(commands.HelpCommand):
         if len(command.aliases) > 0:
             aliases=f"`{'` | `'.join(list(command.aliases))}`"
 
-        sub = "No subcommands."
-
-        if isinstance(command, commands.Group):
-
-            if len(command.commands) > 0:
-                aliases=f"`{'` | `'.join(list(command.commands))}`"
-
         embed.add_field(name="Aliases", value=aliases)
-        embed.add_field(name="Subcommands", value=sub)
         embed.add_field(name="Module", value=command.cog.qualified_name.capitalize())
 
         return embed
@@ -153,24 +145,7 @@ class MyHelp(commands.HelpCommand):
         prefix = self.clean_prefix
 
         # list of commands
-        command_list = []
-
-
-        for cog in bot.cogs.values():
-            # go through all bot cogs.
-
-            for cmd in cog.walk_commands():
-                # go through all commands in this cog.
-
-                if cmd.hidden and not await bot.is_owner(ctx.author):
-                    # ignore all hidden commands as long as the author is not a bot owner
-                    continue
-
-                if cmd.cog.qualified_name == "Jishaku":
-                    # ignore all jishaku commands
-                    continue
-
-                command_list.append(cmd)
+        command_list = bot.get_vissible_commands(await bot.is_owner(ctx.author))
 
 
         try:
@@ -190,10 +165,9 @@ class MyHelp(commands.HelpCommand):
         for cmd in command_list:
             # loop through commands in command list
 
-            if isinstance(cmd, commands.Command):
-                # create embed and add to paginator
-                embed = self.generate_command_embed(bot, prefix, cmd)
-                paginator.add_page(embed)
+            # create embed and add to paginator
+            embed = self.generate_command_embed(bot, prefix, cmd)
+            paginator.add_page(embed)
 
         # start paginator
         await paginator.start(ctx)
