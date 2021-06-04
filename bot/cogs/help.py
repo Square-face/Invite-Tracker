@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-import utils.paginator as pages
+from utils.paginator import Paginator
+from typing import Union
 
 
 class MyHelp(commands.HelpCommand):
@@ -115,80 +116,299 @@ class MyHelp(commands.HelpCommand):
         # send embed
         return await ctx.send(embed=embed)
         
-    def generate_command_embed(self, bot, prefix, command):
+        
+        
+        
+    def generate_command_embed(self, command) -> discord.Embed:
+        """Generate embed object for command
+        
+        Generate a help embed for a command. Works with both commands and
+        groups. Info that will be shown includes, command name, command
+        description, syntax, command aliases, its module and if possible,
+        its subcommands
+        
+        args
+        ----
+        command: Union[:class:`commands.Command`, :class:`commands.Group`]
+            the command to generate embed for
+        
+        returns
+        -------
+        :class:`discord.Embed`
+            the embed object for this command
+        """
+        
+        # defining variables
+        ctx     = self.context
+        bot     = ctx.bot
+        prefix  = self.clean_prefix
+        
+        # generate syntax
+        base_command = f"{prefix}{command.qualified_name}"
+        
+        if not command.signature:
+            # if it has no variables that has to be passed
+            # just use the prefix + command WITHOUT a space after.
+            syntax = f"`{base_command}`"
+        else:
+            # if the command has a signature,
+            # use prefix + command + " " + signature
+            # the space is important for the formating
+            syntax = f"`{base_command} {command.signature}`"
+        
+        # create base embed
         embed=discord.Embed(
             title=f"{command.name} help",
-            description=f"{command.help}",
+            description=f"{command.help or 'This command has no description!'}",
             color=bot.config.Color
         ).add_field(
             name="Syntax",
-            value=f"`{prefix}{command.qualified_name} {command.signature}`",
+            value=syntax
+        )
+        
+        # what module this command is from
+        embed.add_field(
+            name    = "Module",
+            value   = command.cog.qualified_name.capitalize(),
             inline=False
         )
+        
+        # if the command is a subcommand, show its parent(s)
+        if command.parent:
+            embed.add_field(
+                name="Parent(s)",
+                value=f'`{command.full_parent_name.replace(" ", "` > `")}`'
+            )
 
+        # --adding the aliases--
+        
+        # default text
+        aliases="No aliases."
 
-        try:
-            aliases="No aliases."
-
-            if len(command.aliases) > 0:
-                aliases=f"`{'` | `'.join(list(command.aliases))}`"
+        # if the command has no aliases, set the value to "No aliases."
+        if len(command.aliases) > 0:
             
-            embed.add_field(name="Aliases", value=aliases)
+            # the command has aliases
+            aliases=f"`{'` | `'.join(list(command.aliases))}`"
+        
+        # add field
+        embed.add_field(
+            name    = "Aliase(s)", 
+            value   = aliases
+        )
+        
+        
+        # --adding the subcommands
+        if isinstance(command, commands.Group):
+            # this is only done if the command is a group
+            # normal commands can't have subcommands
             
+            # default text
+            sub = "No subcommands"
             
-            if isinstance(command, commands.Group):
-                sub = "No subcommands"
+            # if the command has no subcommands,
+            # set the value to "No subcommands."
+            if len(command.commands) > 0:
                 
-                if len(command.commands) > 0:
-                    sub=f"`{'` | `'.join([cmd.name for cmd in list(command.commands)])}`"
+                # the command has subcommands
                 
-                embed.add_field(name="Subcommands", value=sub)
-
+                # generate list with all subcommand names
+                subcommands = [cmd.name for cmd in list(command.commands)]
+                sub=f"`{'` | `'.join(subcommands)}`"
             
-            embed.add_field(name="Module", value=command.cog.qualified_name.capitalize())
+            # add the field
+            embed.add_field(
+                name    = "Subcommand(s)",
+                value   = sub
+            )
 
-            return embed
-        except Exception as e:
-            print(e)
+        # return compleated embed
+        return embed
 
+
+
+
+    def _is_valid(self, command: Union[commands.Command, commands.Group], is_owner:bool=False):
+        """Is a command good to show to anyone
+        
+        Checks if the supplied command is hidden
+        
+        args
+        ----
+        command: Union[:class:`discord.Command`, :class:`discord.Group`]
+            the command to check
+        is_owner: Optional[:class:`bool`]
+            if the author is a bot owner. Defaults to False.
+        
+        returns
+        -------
+        :class:`bool`
+            if the command is valid or not
+        """
+
+        if is_owner:
+            # if the user is a owner all other commands will be valid
+            return True
+        
+        # if the command is not hidden, return True
+        return not command.hidden
+
+
+
+
+    async def generate_embeds_for_normal_command(self, command):
+        """Generate a list of embeds for all the commands for this bot.
+        
+        A list of embeds for each and every command in the bot. This includes all
+        commands with subcommands or so called "groups", they will have a special
+        area for listing their subcommands. The function will also return the index
+        for the command requested.
+        
+        args
+        ----
+        commands: Union[:class:`discord.Command`, :class:`discord.Group`]
+        
+        returns
+        -------
+        List[:class:`discord.Embed`]:
+            A list with a embed for each command this bot has.
+        
+        :class:`int`
+            The index in the embed list for the requested command.
+        """
+        
+        # define variables
+        embeds = []
+        index = None
+        ctx = self.context
+        bot = ctx.bot
+        attempted_command = ctx.message.content.split()[1]
+        is_owner = await bot.is_owner(ctx.author)
+        
+        if command.cog.qualified_name == "Jishaku" and not is_owner:
+            await ctx.send(f'No command called "{attempted_command}" found.')
+            return
+        
+        for cog in bot.cogs.values():
+            # go trough each cog this bot currently has active
+            
+            for cmd in cog.walk_commands():
+                # go through each command in this cog
+                
+                if self._is_valid(cmd, is_owner) and not cmd.parent:
+                    # if command is valid, create embed
+                    embed=self.generate_command_embed(cmd)
+                    embeds.append(embed)
+                    
+                    if cmd == command:
+                        # if this command is the requested one, set the index
+                        index = embeds.index(embed)
+
+        return embeds, index
+
+    
+    async def generate_embeds_for_subcommand(self, command):
+        """Generate a list of embeds for all the subcommands for this commands parent
+        
+        A list of embeds for each and every command in this commands parent. This includes all
+        commands with subcommands or so called "groups", they will have a special
+        area for listing their subcommands. The function will also return the index
+        for the command requested.
+        
+        args
+        ----
+        commands: Union[:class:`discord.Command`, :class:`discord.Group`]
+        
+        returns
+        -------
+        List[:class:`discord.Embed`]:
+            A list with a embed for each command this bot has.
+        
+        :class:`int`
+            The index in the embed list for the requested command.
+        """
+        
+        # define variables
+        embeds = []
+        index = None
+        ctx = self.context
+        bot = ctx.bot
+        attempted_command = " ".join(ctx.message.content.split()[1])
+        is_owner = await bot.is_owner(ctx.author)
+        
+        if command.cog.qualified_name == "Jishaku" and not is_owner:
+            await ctx.send(f'No command called "{attempted_command}" found.')
+            return
+        
+        for cmd in command.parent.commands:
+            # go through each command in this cog
+            
+            if self._is_valid(cmd, is_owner):
+                # if command is valid, create embed
+                embed=self.generate_command_embed(cmd)
+                embeds.append(embed)
+                
+                if cmd == command:
+                    # if this command is the requested one, set the index
+                    index = embeds.index(embed)
+
+        return embeds, index
+    
+    
+    
+    
     async def send_command_help(self, command):
         """Show info on a command.
 
         Make a paginator with all the commands and the first page is the requested command.
         """
-
         # get variables
         ctx = self.context
         bot = ctx.bot
-        prefix = self.clean_prefix
+        attempted_command = " ".join(ctx.message.content.split()[1:])
+        is_owner = await bot.is_owner(ctx.author)
+        
+        
+        # return error if the command is hidden
+        if command.hidden and not is_owner:
+            await ctx.send(f'No command called "{attempted_command}" found.')
+            return
 
-        # list of commands
-        command_list = bot.get_visible_commands(await bot.is_owner(ctx.author))
-
-
-        try:
-            # try to find command in command list
-            command_index = command_list.index(command)
-        except ValueError:
-            # the command was not found,
-            # therefor its a hidden command.
-            return await ctx.send(f"No command called \"{ctx.message.content.split(' ')[1]}\" found")
-
-
-
-        paginator = pages.Paginator(page=command_index)
-        # create paginator
-
-
-        for cmd in command_list:
-            # loop through commands in command list
-
-            # create embed and add to paginator
-            embed = self.generate_command_embed(bot, prefix, cmd)
-            paginator.add_page(embed)
-
-        # start paginator
+        if command.parent:
+            embeds, index = await self.generate_embeds_for_subcommand(command)
+        else:
+            embeds, index = await self.generate_embeds_for_normal_command(command)
+        
+        
+        paginator = Paginator(page=index, pages=embeds)
         await paginator.start(ctx)
+    
+    async def send_group_help(self, command):
+        """Show info on a command.
+
+        Make a paginator with all the commands and the first page is the requested command.
+        """
+        # get variables
+        ctx = self.context
+        bot = ctx.bot
+        attempted_command = " ".join(ctx.message.content.split()[1:])
+        is_owner = await bot.is_owner(ctx.author)
+        
+        
+        # return error if the command is hidden
+        if command.hidden and not is_owner:
+            await ctx.send(f'No command called "{attempted_command}" found.')
+            return
+        
+        if command.parent:
+            embeds, index = await self.generate_embeds_for_subcommand(command)
+        else:
+            embeds, index = await self.generate_embeds_for_normal_command(command)
+        
+        
+        paginator = Paginator(page=index, pages=embeds)
+        await paginator.start(ctx)
+
 
 def setup(bot):
     bot._original_help_command = bot.help_command
