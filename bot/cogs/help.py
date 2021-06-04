@@ -33,18 +33,18 @@ class MyHelp(commands.HelpCommand):
 
             for cmd in extension.walk_commands():
                 # go through all commands
-                
+
                 if cmd.hidden and not await bot.is_owner(ctx.author):
                     # if the command is hidden and the author is not a bot owner
                     continue
-                    
+
                 # add the command to command list
                 commands.append(f"`{cmd.name:10}` - {cmd.brief}")
 
             if len(commands) == 0:
                 # ignore this extension if it didn't have any commands
                 continue
-                
+
             # add the extension to embed with all of its commands
             embed.add_field(
                 name=extension.qualified_name,
@@ -90,28 +90,7 @@ class MyHelp(commands.HelpCommand):
         prefix = self.clean_prefix
 
         # list of commands
-        command_list = []
-
-
-        for cog in bot.cogs.values():
-            # go through all bot cogs.
-
-            for cmd in cog.walk_commands():
-                # go through all commands in this cog.
-
-                if cmd.hidden and not await bot.is_owner(ctx.author):
-                    # ignore all hidden commands as long as the author is not a bot owner
-                    continue
-
-                if isinstance(cmd, commands.Group):
-                    # ignore all group commands
-                    continue
-
-                if cmd.cog.qualified_name == "Jishaku":
-                    # ignore all jishaku commands
-                    continue
-
-                command_list.append(cmd)
+        command_list = bot.get_vissible_commands(await bot.is_owner(ctx.author))
 
 
         try:
@@ -131,10 +110,9 @@ class MyHelp(commands.HelpCommand):
         for cmd in command_list:
             # loop through commands in command list
 
-            if isinstance(cmd, commands.Command):
-                # create embed and add to paginator
-                embed = self.generate_command_embed(bot, prefix, cmd)
-                paginator.add_page(embed)
+            # create embed and add to paginator
+            embed = self.generate_command_embed(bot, prefix, cmd)
+            paginator.add_page(embed)
 
         # start paginator
         await paginator.start(ctx)
