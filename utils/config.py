@@ -55,14 +55,12 @@ class Config():
         self.db.Port = self.stream["Port"]
         self.db.User = self.stream["User"]
         self.db.Password = self.stream["Password"]
+        self.db.DBName = self.stream["DBName"]
     
     def CheckConfig(self):     
         """Check the config file
         
-        Make sure all values are filled in config file.
-        
-        Returns:
-            bool: Wether all values where filled or not.
+        Make sure all values are filled and exists in config file.
         """
         
         file = open(self.filename, "r")
