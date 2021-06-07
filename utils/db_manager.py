@@ -1,8 +1,12 @@
 import asyncio
 import aiomysql as mysql
 from discord.ext.commands import Bot
+from typing import Optional
 
 class SubCache(object):
+    
+    class InvalidEnumValue(Exception):
+        pass
     
     def __init__(self, bot, table):
         self.bot = bot
@@ -18,13 +22,45 @@ class SubCache(object):
         
         
         cursor = await self.db.execute(f"SELECT * FROM {self.table}")
-        results = cursor.fetchall()
+        results = await cursor.fetchall()
         
         for result in results:
             self.data.append(result)
 
 class blacklist(SubCache):
-    pass
+    async def add(self, id:int, type:str, reason:Optional[str]="No reason specified."):
+        """Add a user or server to blacklist.
+        
+        The type can only be "user" or "guild"
+        
+        args
+        ----
+        id: :class:`int`
+            The id of the server or user to be blacklisted.
+        type: :class:`str`
+            If its a server or a user that is going to be blacklisted.
+            Can only be "user" or "guild"
+        reason: Optional[:class:`str`]
+            The reason this server or user is blacklisted.
+            Defaults to "No reason specified."
+        
+        raises
+        -------
+        :Exception:`InvalidEnumValue`
+            the type is not "user" or "guild"
+        """
+        
+        if not type.lower() in ["user", "guild"]:
+            raise self.InvalidEnumValue(f'Type can only be "user" or "guild" and not "{type}"')
+        
+        if id in [d[1] for d in self.data]:
+            return
+        
+        await self.db.execute("INSERT INTO blacklist (id, type, reason) VALUES (%s, %s, %s)", (id, type, reason), commit=True)
+        cursor = await self.db.execute("SELECT index_id FROM blacklist WHERE id = %s", (id,))
+        
+        index = (await cursor.fetchall())[0][0]
+        self.data.append((index, id, type, reason))
 
 
 class Cache():
@@ -144,7 +180,7 @@ class DataBase():
                 
                 if commit:
                     # commit to database if specified
-                    await cursor.commit()
+                    await con.commit()
                 
                 # return cursor
                 return cursor
