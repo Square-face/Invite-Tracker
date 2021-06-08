@@ -16,32 +16,36 @@ class Settings(commands.Cog):
 
     @commands.Cog.listener("on_command_error")
     async def command_not_found(self, ctx, error):
+        """Atempt at invoking a command that doesn't exist
+
+        A user tried to invoke a command that doesn't exist.
+        Try to find commands with matching names to the atempted commands.
+        For example if the user misspelled a command name.
+        """
         if not isinstance(error, commands.CommandNotFound):
+            # if the error isn't a CommandNotFound error
             return
 
+        # get the atempted command name
         command = ctx.message.content.split()[0][len(ctx.prefix):]
 
-        command_list = []
+        # get list of all commands
+        command_list = self.bot.get_normal_commands(await self.bot.is_owner(ctx.author))
 
-        for cmd in self.bot.walk_commands():
-            if cmd.hidden or cmd.cog.qualified_name == "Jishaku":
-                continue
-
-            command_list.append(cmd.qualified_name)
-
-            for alias in cmd.aliases:
-                command_list.append(alias)
-
+        # the matches from command list to atempted command
         matches = difflib.get_close_matches(command, command_list, 5, 0.6)
         guessed_commands=[]
 
         for match in matches:
+            # get actual command name for match
             guessed_commands.append(self.bot.get_command(match).qualified_name)
 
+        # remove any dupes
         guessed_commands=list(set(guessed_commands))
 
 
         if len(matches) > 0:
+            # if one or more matches was found, return them
             await ctx.send(f":warning: **Command Not Found!**\nDid you mean:\n- `"+'`\n- `'.join(guessed_commands)+"`")
 
 
