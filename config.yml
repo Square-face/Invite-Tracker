@@ -1,4 +1,5 @@
-# ---Bot---
+# Bot
+# ---
 
 # the bot token. Can be found on discord.com/developers
 Token:  ""
@@ -12,9 +13,20 @@ Color:  0xfa2a3f
 # short description about the bot
 Description: "A bot to track who has invited who and reward the ones who has invited the most!"
 
+# logging
+# -------
+
+Servers:  null # When the bot joins or leaves a server.
+Commands: null # When a user invokes a command.
+Errors:   null # if a cmmand or event errors.
+DMs:      null # When someone sends a DM to the bot.
+Website:  null # When someone goes to the website, or logs in.
+Events:   null # Other events that are not listed above.
+=======
 
 
-# ---DataBase---
+# Database
+# --------
 
 # The ip of your MariaDB database
 Host: 127.0.0.1
