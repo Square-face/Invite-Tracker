@@ -55,13 +55,13 @@ class Settings(commands.Cog):
         """Get a channel from id
 
         Take a channel id and make sure it is a valid id, a channel the bot has
-        access to and that the bot has ncesarry permissioins to send embeds in
+        access to and that the bot has necessary permissions to send embeds in
         the channel.
 
         args
         ----
         id: :class:´int´
-            The id for the channel. Can be None but that will autmaticaly
+            The id for the channel. Can be None but that will automatically
             return None. Defaults to None.
 
         returns

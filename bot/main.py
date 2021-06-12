@@ -120,19 +120,20 @@ class InviteTracker(Bot):
         for cog in self.cogs.values():
             # go through all cogs and the commands inside of each cog
 
-            # ignore the jishaku cog
+            
             if cog.qualified_name == "Jishaku":
+                # ignore the jishaku cog
                 continue
 
             for cmd in cog.walk_commands():
                 
                 if cmd.parent:
                     # ignore all commands that has a parent command,
-                    # this means they are a subcommand and should not be added.
+                    # this means they are a subcommand and should not be included.
                     continue
 
                 if not cmd.hidden or is_owner:
-                    # add the command if it is not hidden and the user is not a bot owner.
+                    # add the command if it is not hidden or the user is a bot owner.
                     command_list.append(cmd)
 
 
