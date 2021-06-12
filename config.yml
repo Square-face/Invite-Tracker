@@ -1,8 +1,6 @@
 # Bot
 # ---
 
-
-
 # the bot token. Can be found on discord.com/developers
 Token:  ""
 
@@ -24,6 +22,25 @@ Errors:   null # if a cmmand or event errors.
 DMs:      null # When someone sends a DM to the bot.
 Website:  null # When someone goes to the website, or logs in.
 Events:   null # Other events that are not listed above.
+=======
+
+
+# Database
+# --------
+
+# The ip of your MariaDB database
+Host: 127.0.0.1
+
+# the port for your MariaDB database
+# 3306 is the default MariaDB port
+Port: 3306
+
+# Username for your MariaDB database
+User: ""
+
+# Password for your MariaDB database
+Password: ""
+
 
 # Website
 # -------
