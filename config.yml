@@ -41,6 +41,9 @@ User: ""
 # Password for your MariaDB database
 Password: ""
 
+# The database all data is stored in
+DBName: ""
+
 
 # Website
 # -------
