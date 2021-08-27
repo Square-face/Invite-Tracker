@@ -4,9 +4,9 @@ from typing import Union, List
 
 
 class Paginator(menus.Menu):
-    """Navigate menu with reactions.
+    """Navigation menue with reactions
 
-    Navigate a menu by reaction to reactions. a list of pages is passed and a
+    Navigate a menu by reaction to reactions. A list of pages is passed and a
     start page. The start page is 0 by default. When the start function is ran
     and there is no specified message a new one will be sent. If there is one
     the reactions will be added to that message.
@@ -22,48 +22,50 @@ class Paginator(menus.Menu):
     planed buttons:
     NUMBER: Choice a page to go to by sending a number in chat.
     INFO:   Show info on what all the buttons do.
+
+    Args:
+    ----
+    page: Optional[:class:`int`]
+        The currently selected page. First page is 1. Defaults to 1
+
+
+    Kwargs:
+    -------
+    user: Optional[:class:`discord.User`]
+        The user who can edit this paginator.
+        Can be None if anyone should be able to edit the paginator. Defaults
+        to None.
+    users: Optional[List[:class:`discord.User`]]
+        A list of user who can edit this paginator. If user arg was
+        specified this arg will be ignored. Can be None if anyone should be
+        able to edit the paginator. Defaults to None.
+    timeout: Optional[:class:`float`]
+        The amount of time in seconds the user has between each reaction.
+        If more time has passed the paginator will stop listen for reactions.
+        Defaults to 120.0.
+    delete_message_after: Optional[:class:`bool`]
+        If the paginator should be deleted when the exit/stop button is
+        pressed or the timeout is reached. Defaults to False.
+    clear_reactions_after: Optional[:class:`bool`]
+        If the paginator should clear all reactions when the exit/stop
+        button is pressed or the timeout is reached. Defaults to True.
+    check_embeds: Optional[:class:`bool`]
+        If wther to verify embed permissions. Should not be active if the
+        paginator doesn't contain any embeds. Defaults to True.
+    message: Optional[:class:`discord.Message`]
+        The message this paginator is active on. Set to None if a new
+        message should be created. Defaults to None
+    replace_footer: Optional[:class:`bool`]
+        If the paginator should try to replace embed footers to
+        "Page: {current_page}/{total_pages}" when using them. Note that no
+        embeds with a aledy set footer will have the replaced. This only
+        applyes to embeds without footers. Defaults to True.
     """
+
     def __init__(self, *, user:discord.User=None, users:List[discord.User]=None, page:int=0, pages:List[Union[discord.Embed, str]]=None, timeout:float=180.0, delete_message_after:bool=False, clear_reactions_after:bool=True, check_embeds:bool=True, message:discord.Message=None, replace_footer:bool=True):
-        """
+        """Init
+
         Defining all variables for paginator.
-
-        args
-        ----
-        page: Optional[:class:`int`]
-            The currently selected page. First page is 1. Defaults to 1
-
-
-        kwargs
-        ------
-        user: Optional[:class:`discord.User`]
-            The user who can edit this paginator.
-            Can be None if anyone should be able to edit the paginator. Defaults
-            to None.
-        users: Optional[List[:class:`discord.User`]]
-            A list of user who can edit this paginator. If user arg was
-            specified this arg will be ignored. Can be None if anyone should be
-            able to edit the paginator. Defaults to None.
-        timeout: Optional[:class:`float`]
-            The amount of time in seconds the user has between each reaction.
-            If more time has passed the paginator will stop listen for reactions.
-            Defaults to 120.0.
-        delete_message_after: Optional[:class:`bool`]
-            If the paginator should be deleted when the exit/stop button is
-            pressed or the timeout is reached. Defaults to False.
-        clear_reactions_after: Optional[:class:`bool`]
-            If the paginator should clear all reactions when the exit/stop
-            button is pressed or the timeout is reached. Defaults to True.
-        check_embeds: Optional[:class:`bool`]
-            If wther to verify embed permissions. Should not be active if the
-            paginator doesn't contain any embeds. Defaults to True.
-        message: Optional[:class:`discord.Message`]
-            The message this paginator is active on. Set to None if a new
-            message should be created. Defaults to None
-        replace_footer: Optional[:class:`bool`]
-            If the paginator should try to replace embed footers to
-            "Page: {current_page}/{total_pages}" when using them. Note that no
-            embeds with a aledy set footer will have the replaced. This only
-            applyes to embeds without footers. Defaults to True.
         """
 
         self.pages = pages or []
@@ -241,11 +243,7 @@ class Paginator(menus.Menu):
         # reset page
         self.page = 0
 
-        # get coroutine for editing message
-        send = self._get_message()
-
-        # edit message
-        await send
+        return await self._get_message()
 
 
     @menus.button('\U000025c0')
@@ -262,11 +260,7 @@ class Paginator(menus.Menu):
         # lower current page by 1
         self.page -= 1
 
-        # get coroutine for editing message
-        send = self._get_message()
-
-        # edit message
-        await send
+        return await self._get_message()
 
 
     @menus.button('\U000023f9')
@@ -296,11 +290,7 @@ class Paginator(menus.Menu):
         # increase current page by 1
         self.page += 1
 
-        # get coroutine for editing message
-        send = self._get_message()
-
-        # edit message
-        await send
+        return await self._get_message()
 
 
     @menus.button('\U000023e9')
@@ -312,8 +302,4 @@ class Paginator(menus.Menu):
         # set current page to total number of pages.
         self.page = len(self.pages)-1
 
-        # get coroutine for editing message
-        send = self._get_message()
-
-        # edit message
-        await send
+        return await self._get_message()
