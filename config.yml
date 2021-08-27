@@ -4,6 +4,10 @@
 # the bot token. Can be found on discord.com/developers
 Token:  ""
 
+# the client secret for your aplication
+Secret: ""
+
+
 # the default prefix for invoking a command with the bot
 Prefix: ","
 
@@ -22,7 +26,7 @@ Errors:   null # if a cmmand or event errors.
 DMs:      null # When someone sends a DM to the bot.
 Website:  null # When someone goes to the website, or logs in.
 Events:   null # Other events that are not listed above.
-=======
+# =======
 
 
 # Database
@@ -41,8 +45,45 @@ User: ""
 # Password for your MariaDB database
 Password: ""
 
+# The database all data is stored in
+DBName: "InviteTracker"
 
-# Website
-# -------
 
-# coming soon
+
+# emojis
+# ------
+
+# The emojis used by the bot
+# Its important that the bot has access to the emojis to use, if it doesn't, it will just leave the spot blank
+# warning means no emoji is set
+# double-exclamation means the bot is missing necessary permissions to use the emoji
+# exclamation means the bot does not have access to the emoji
+
+# NOTE:
+#  The recomended url is NOT what should be used
+#  Its only a sugestion for the url that should be used for the emoji
+
+# recomended emoji URL: https://cdn.discordapp.com/emojis/778530101179973632.png?v=1
+confirm: "<:Yes:778530101179973632>"
+
+# recomended emoji URL: https://cdn.discordapp.com/emojis/778530212790927370.png?v=1
+deny: "<:No:778530212790927370>"
+
+# recomended emoji URL: https://cdn.discordapp.com/emojis/847037734848692275.gif?v=1
+loading: "<a:Loading:847037734848692275>"
+
+# recomended emoji URL: https://cdn.discordapp.com/emojis/778351389415440395.png?v=1
+voice_channels: "<:Voice_Channel:778351389415440395>"
+
+# recomended emoji URL: https://cdn.discordapp.com/emojis/778350926468743228.png?v=1
+text_channels: "<:Text_Channel:778350926468743228>"
+
+
+
+# Dashboard
+
+# The url for website. If the website is localhost, use "http://127.0.0.1"
+URL: "http://127.0.0.1"
+
+# port number for the website, usualy 5000 for localhost
+PORT: 5000

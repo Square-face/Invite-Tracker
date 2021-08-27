@@ -55,7 +55,7 @@ class InviteTracker(Bot):
 
 
     async def on_ready(self):
-        '''Bot has connected to discord API
+        '''Bot has connected to discord
 
         Sets start time to currently UTC datetime and prints out startup message.
         '''
@@ -86,19 +86,23 @@ class InviteTracker(Bot):
         for extension in extensions:
             # go through extensions to load them
 
+            precentage = round(((extensions.index(extension)+1)/len(extensions))*100)
+
+            start = f"{precentage:3}% - "
+
             try:
                 # attemt to load extension
                 self.load_extension(extension)
 
             except Exception as e:
                 # send error if loading extension failed
-                print(f"[{extensions.index(extension)+1}] - Failed to load extension: {extension}\n{e}\n")
+                print(f"{start}Failed to load extension: {extension}\n{e}\n")
 
             else:
-                print(f"[{extensions.index(extension)+1}] - Loaded extension: {extension}")
+                print(f"{start}Loaded extension: {extension}")
         return
 
-    def get_normal_commands(self, is_owner:bool=False):
+    def get_normal_commands(self, is_owner:bool=False) -> list:
         """Get a list of all available commands.
 
         Generates a list of all the commands and groups that are not owner only
@@ -128,8 +132,7 @@ class InviteTracker(Bot):
             for cmd in cog.walk_commands():
                 
                 if cmd.parent:
-                    # ignore all commands that has a parent command,
-                    # this means they are a subcommand and should not be included.
+                    # ignore all commands that has a parent command
                     continue
 
                 if not cmd.hidden or is_owner:
@@ -140,7 +143,7 @@ class InviteTracker(Bot):
         return command_list
 
 
-    def get_subcommands(self, is_owner:bool=False):
+    def get_subcommands(self, is_owner:bool=False) -> list:
         """Get a list of all available subcommands.
 
         Generates a list of all the commands and groups that are not owner only
@@ -160,7 +163,6 @@ class InviteTracker(Bot):
         command_list = []
 
         for cog in self.cogs.values():
-            # go through all cogs and the commands inside of each cog
 
             # ignore the jishaku cog
             if cog.qualified_name == "Jishaku":
@@ -169,8 +171,7 @@ class InviteTracker(Bot):
             for cmd in cog.walk_commands():
                 
                 if not cmd.parent:
-                    # ignore all commands that has a parent command,
-                    # this means they are a subcommand and should not be added.
+                    # ignore all commands that doesn't have a parent command.
                     continue
 
                 if not cmd.hidden or is_owner:
