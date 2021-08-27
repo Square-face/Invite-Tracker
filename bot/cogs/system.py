@@ -1,7 +1,7 @@
 import discord, difflib, datetime
 from discord.ext import commands
 
-class Settings(commands.Cog):
+class System(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -49,6 +49,40 @@ class Settings(commands.Cog):
             await ctx.send(f":warning: **Command Not Found!**\nDid you mean:\n- `"+'`\n- `'.join(guessed_commands)+"`")
 
 
+    @commands.Cog.listener("on_command_error")
+    async def error_log(self, ctx, error):
+        """A command has failed because of a error
+
+        A command has been used and for some reason didn't finish properly.
+        The user will be notified and the error message will be loged.
+        """
+
+        # get channel
+        channel = self.get_config_channel(self.bot.config.logging.Errors)
+
+        if not channel:
+            # invalid channel
+            return
+        
+
+        if isinstance(error, commands.CommandNotFound):
+            # error is alredy checked for, ignore
+            return
+
+
+        # create log embed
+        embed = discord.Embed(
+            title="Command Error",
+            description=ctx.message.content,
+            color=0xFF0000,
+            timestamp=ctx.message.created_at
+        ).add_field(
+            name="Message",
+            value=f"[Jump to message]({ctx.message.jump_url})"
+        )
+
+        await channel.send(self.bot.config.channel.error).send(embed=embed)
+        return await ctx.send("Uh oh, I don't feel so good.")
 
 
     def get_config_channel(self, id: int=None):
@@ -60,7 +94,7 @@ class Settings(commands.Cog):
 
         args
         ----
-        id: :class:´int´
+        id: :class:`int`
             The id for the channel. Can be None but that will automatically
             return None. Defaults to None.
 
@@ -217,4 +251,4 @@ class Settings(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Settings(bot))
+    bot.add_cog(System(bot))

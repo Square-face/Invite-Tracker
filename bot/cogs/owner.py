@@ -207,45 +207,48 @@ class Owner(commands.Cog):
     async def blacklist(self, ctx):
         if ctx.invoked_subcommand:
             return
-        
+
         await ctx.send("This is a decoy command")
-    
+
     @blacklist.group(hidden=True, aliases=["u"], brief="Show blacklists for users")
     @commands.is_owner()
     async def user(self, ctx):
         """Show all blacklisted users
-        
+
         Display every user who is currently blacklisted and their individual reasons.
         """
-        
+
         if ctx.invoked_subcommand:
             return
-        
+
         blacklists = {}
-        
+
         for entry in self.bot.cache.blacklist.data:
             # go trough blacklisted users
-            
+
             if entry[2] == "server":
                 continue
-            
-            user = await self.bot.fetch_user(entry[1])
+
+            try:
+                user = await self.bot.fetch_user(entry[1])
+            except discord.errors.NotFound:
+                user = entry[1]
             blacklists[user]=entry[3]
-        
+
         await ctx.send(blacklists)
-    
-    @user.command(hidden=True, name="blacklist", aliases=["bl", "user", "u"], brief="blacklist a user")
+
+    @user.command(hidden=True, name="blacklist", aliases=["bl", "add", "a"], brief="blacklist a user")
     @commands.is_owner()
     async def add(self, ctx, subject_id:int, reason:str="No reason specified."):
         """Blacklist a user
-        
+
         Add a user or a server to the bot's blacklist.
         """
-        
+
         if subject_id in [d[1] for d in self.bot.cache.blacklist.data]:
             # fetch user from discord
             user = await self.bot.fetch_user(subject_id)
-            
+
             # create response embed
             embed = discord.Embed(
                 title=f"{user.name} is already blacklisted",
@@ -255,25 +258,25 @@ class Owner(commands.Cog):
                 name=user.__str__(),
                 icon_url=user.avatar_url
             )
-            
+
             # send response
             return await ctx.send(embed=embed)
-        
-        
+
+
         # check if subject is user or server or invalid
         try:
             # attempt to fetch user from discord
             user = await self.bot.fetch_user(subject_id)
-            
+
         except discord.errors.NotFound:
             # failed to fetch user, not a userid
             # invalid user
             return await ctx.send(f"Invalid user id.")
-        
-        
+
+
         # add user to database
         await self.bot.cache.blacklist.add(user.id, "user", reason)
-        
+
         # create response embed
         embed = discord.Embed(
             title=f'{user.name} is now blacklisted.',
@@ -283,12 +286,12 @@ class Owner(commands.Cog):
             name=user.__str__(),
             icon_url=user.avatar_url
         )
-        
+
         # send response
         return await ctx.send(embed=embed)
-    
-    
-    
+
+
+
     @blacklist.command(hidden=True, aliases=["ubl", "remove", "r"], brief="UnBlacklist a user or server")
     @commands.is_owner()
     async def unblacklist(self, ctx, subject):
