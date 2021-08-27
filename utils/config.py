@@ -4,10 +4,8 @@ Manage the config file and request attributes.
 '''
 
 import yaml
-try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
+
+from yaml import Loader
 
 
 class MissingKey(Exception):
@@ -46,13 +44,14 @@ class Config():
 
         self.CheckConfig()
 
-        # bot values
+        # bot
         self.Token  = self.stream["Token"]
+        self.Secret = self.stream["Secret"]
         self.Prefix = self.stream["Prefix"]
         self.Color  = self.stream["Color"]
         self.Description = self.stream["Description"]
         
-        # logging values
+        # logging
         self.logging = Sub()
         self.logging.Servers    = self.stream["Servers"]
         self.logging.Commands   = self.stream["Commands"]
@@ -61,29 +60,45 @@ class Config():
         self.logging.Website    = self.stream["Website"]
         self.logging.Events     = self.stream["Events"]
 
-        # database values
+        # database
         self.db = Sub()
         self.db.Host = self.stream["Host"]
         self.db.Port = self.stream["Port"]
         self.db.User = self.stream["User"]
         self.db.Password = self.stream["Password"]
         self.db.DBName = self.stream["DBName"]
+
+        # Dashbaord
+        self.Dashboard = Sub()
+        self.Dashboard.Url = self.stream["URL"]
+        self.Dashboard.Port = self.stream["PORT"]
+
+        # emojis
+        self.emojis = {
+            "yes": self.stream["confirm"], "no": self.stream["deny"],
+            "voice": self.stream["voice_channels"], "text": self.stream["text_channels"],
+            "loading": self.stream["loading"]
+        }
+
     
-    def CheckConfig(self):     
+    def CheckConfig(self) -> bool:     
         """Check the config file
         
-        Make sure all values are filled and exists in config file.
+        Make sure all values and 
         """
 
         file = open(self.filename, "r")
         stream = yaml.load(file.read(), Loader=Loader)
 
         args = [
-            "Token", "Prefix", "Color", "Description", "Servers", "Commands", "Errors", "DMs", "Website", "Events", "Host", "Port", "User", "Password"
+            "Token", "Prefix", "Color", "Description", "Servers", "Commands", "Errors", "DMs",
+            "Website", "Events", "Host", "Port", "User", "Password", "confirm", "deny", "loading",
+            "voice_channels", "text_channels"
         ] # all keys that has to be in config file
         can_be_empty = [
-            "Color", "Servers", "Commands", "Errors", "DMs", "Website", "Events"
-        ]            # they keys that can still be 0 or None
+            "Color", "Servers", "Commands", "Errors", "DMs", "Website", "Events", "deny", "confirm",
+            "loading", "voice_channels", "text_channels"
+        ] # they keys that can still be 0 or None
 
         for arg in args:
             if not arg in stream.keys():
@@ -97,3 +112,5 @@ class Config():
             if not stream[arg]:
                 # there is no value for this argument
                 raise MissingValue(f"No value for '{arg}' has been set. Make sure all values in the config file({self.filename}) is set right and restart the bot.")
+        
+        return True

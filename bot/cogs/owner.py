@@ -9,6 +9,11 @@ from discord.ext import commands
 from typing import Optional
 
 
+# symbols
+STOP    = "\U0001f6d1" # 🔁
+RELOAD  = "\U0001f501" # 🛑
+
+
 class Owner(commands.Cog):
     """Owner commands
 
@@ -27,8 +32,8 @@ class Owner(commands.Cog):
         """
         self.bot = bot
 
-    def reload_cogs(self, cogs):
-        '''reload a list of cogs/modules
+    def reload_cogs(self, cogs, ctx):
+        '''Reload a list of cogs/modules
 
         Go through a list of cogs and reload the.
         For the ones that fails, save the error message
@@ -40,14 +45,10 @@ class Owner(commands.Cog):
 
         Args:
         ----
-        cogs: :class:`list`
+        cogs: List[:class:`str`]
             A list of all the cogs that shall be reloaded.
         '''
-
-
-        success = True  # if all cogs so far has been successfully reloaded
-        responses=[]    # list of response messages for each cog/module
-
+        success, responses = True, []
 
         for cog in cogs:
             # go through each cog in cog list
@@ -55,10 +56,9 @@ class Owner(commands.Cog):
 
                 # try to load and unload the cog
                 try:
-                    # ignore error if the cog wasn't loaded
-                    # and try to load it
                     self.bot.unload_extension(cog)
-                except:
+
+                except commands.errors.ExtensionNotLoaded:
                     pass
 
                 # load the cog
@@ -69,75 +69,80 @@ class Owner(commands.Cog):
 
                 # set success variable to false and add error message in response
                 success = False
-                responses.append(f"<:No:778530212790927370> {cog}:```cmd\n{e}```")
+                responses.append(f"{self.bot.smart_emojis.get_emoji('no', ctx.channel)} {cog}:```cmd\n{e}```")
 
             else:
-                # the cog successfully loaded
-                responses.append(f"<:Yes:778530101179973632> {cog}")
+                responses.append(f"{self.bot.smart_emojis.get_emoji('yes', ctx.channel)} {cog}")
 
 
-        # return response list and success variable
+        # return response
         return responses, success
 
-
-    async def retry_cogs(self, ctx, msg, cogs:list):
+    async def retry_cogs(self, ctx:commands.Context, msg:discord.Message, cogs:list):
         '''Reload a list of cogs more than once
 
         This function tries to load a list of cogs, and if loading one fails the developer can react with the repeat reaction to try loading the cogs again.
         This can be done as many times as necessary to fix the issue
 
+        Args:
+        -----
+        ctx: :class:`commands.Context`
+            The current context
+        msg: :class:`discord.Message`
+            The active message
+        cogs: List[:class:`str`]
+            A list of the cogs to check for
         '''
 
-
+        # refresh reactions
         await msg.clear_reactions()
-        await msg.add_reaction("\U0001f501")
-        await msg.add_reaction("\U0001f6d1")
-        # refresh reaction options
+        await msg.add_reaction(RELOAD)
+        await msg.add_reaction(STOP)
 
-
-        def check(r, u):
+        def validate_request(reaction, user) -> bool:
             '''Validating reaction
 
-            Make sure the reaction was performed on the correct message and by the right user.
+            Validate that the detected reaction was done by the author,
+            was one of two options and on the right message.
+
+            Args:
+            -----
+            reaction: :class:`discord.Reaction`
+                The reaction object returned from reaction
+            user: :class:`discord.User`
+                The user who reacted
             '''
-            return u == ctx.author and r.emoji in ["\U0001f501", "\U0001f6d1"] and r.message == msg
+            valid_response = False
+            
+            if user == ctx.author:
+                if reaction.emoji in [RELOAD, STOP]:
+                    if reaction.message == msg:
+                        valid_response = True
+            
+            return valid_response
 
         while True:
             try:
-                # wait for the actual reaction to happend
-                r, u = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                # wait 2 minutes for a reaction on the message
+                reaction, _ = await self.bot.wait_for("reaction_add", timeout=120.0, check=validate_request)
 
             except asyncio.TimeoutError:
-                # if the user to too long to react remove all reactions and stop listening
+                # 2 minutes passed without a reaction
                 return await msg.clear_reactions()
 
             else:
-                # if a reaction was detected
+                # a reaction was detected
 
-                # remove user variable as we don't need it
-                del u
-
-
-                if r.emoji == "\U0001f6d1":
-                    # if the reaction was a stop sign,
-                    # stop listening for reactions
+                if reaction.emoji == STOP:
                     return await msg.clear_reactions()
 
-                # if the code has come this far the cogs should be reloaded again.
-
-                # edit the message to show a spinning loading icon to show that the bot is working
-                await msg.edit(content="<a:Loading:847037734848692275>")
-
-                # reload the cogs
+                # reload the cogs and edit message
+                await msg.edit(content=self.bot.smart_emojis.get_emoji("loading", ctx.channel))
                 response, success = self.reload_cogs(cogs)
-
-                # edit message to show new response
                 await msg.edit(content="\n".join(response))
 
                 if success:
-                    # all the cogs has successfully been loaded, clear reactions and stop listening
                     return await msg.clear_reactions()
-
 
     @commands.command(hidden=True, brief="Some owner(s) only information about the bot.", aliases=["owner"])
     @commands.is_owner()
@@ -185,7 +190,7 @@ class Owner(commands.Cog):
             cogs = list(self.bot.extensions)
 
         # reload the cogs
-        response, success = self.reload_cogs(cogs)
+        response, success = self.reload_cogs(cogs, ctx)
 
         if success:
             # all the cogs was successfully reloaded
