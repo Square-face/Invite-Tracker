@@ -1,4 +1,4 @@
-discord.py==1.7.2
+discord.py==1.7.3
 discord-ext-menus==1.1
 pyyaml==5.4.1
 Jishaku==1.20.0.220
